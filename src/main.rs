@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
 mod assets;
+mod board;
 mod globals;
 mod states;
+mod vectors;
 
 fn main() {
     #[cfg(target_arch = "wasm32")]
@@ -28,5 +30,6 @@ fn main() {
         .insert_resource(Msaa::Off)
         .add_state::<states::MainState>()
         .add_plugin(assets::AssetPlugin)
+        .add_plugin(board::BoardPlugin)
         .run()
 }
