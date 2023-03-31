@@ -5,6 +5,9 @@ mod board;
 mod camera;
 mod globals;
 mod graphics;
+mod input;
+mod pieces;
+mod player;
 mod states;
 mod vectors;
 
@@ -34,6 +37,8 @@ fn main() {
         .add_plugin(assets::AssetPlugin)
         .add_plugin(board::BoardPlugin)
         .add_plugin(graphics::GraphicsPlugin)
+        .add_plugin(input::InputPlugin)
+        .add_plugin(player::PlayerPlugin)
         .add_startup_system(camera::setup)
         .run()
 }
