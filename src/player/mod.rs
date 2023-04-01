@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 
 use crate::board::components::Position;
-use crate::pieces::components::Piece;
+use crate::pieces::components::{Actor, Piece};
 use crate::states::MainState;
 use crate::vectors::Vector2Int;
 
@@ -22,6 +22,7 @@ fn spawn_player(
     mut commands: Commands
 ) {
     commands.spawn((
+        Actor::default(),
         Player,
         Piece { kind: "Player".to_string() },
         Position { v: Vector2Int::new(0, 0) }
