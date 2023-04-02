@@ -9,3 +9,7 @@ pub struct Actor(pub Option<Box<dyn Action>>);
 pub struct Piece {
     pub kind: String
 }
+
+#[derive(Component)]
+// movement behaviour for non-player pieces
+pub struct Walk;

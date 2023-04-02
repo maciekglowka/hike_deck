@@ -43,6 +43,7 @@ fn main() {
         .add_plugin(graphics::GraphicsPlugin)
         .add_plugin(input::InputPlugin)
         .add_plugin(manager::ManagerPlugin)
+        .add_plugin(pieces::PiecesPlugin)
         .add_plugin(player::PlayerPlugin)
         .add_startup_system(camera::setup)
         .run()

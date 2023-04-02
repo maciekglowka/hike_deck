@@ -41,6 +41,5 @@ fn player_position(
         actor.0 = Some(Box::new(action));
         queue.0 = VecDeque::from([entity]);
         ev_input.send(PlayerInputReadyEvent);
-        info!("Input ready");
     }
 }
