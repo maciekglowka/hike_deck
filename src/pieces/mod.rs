@@ -17,16 +17,18 @@ impl Plugin for PiecesPlugin {
 pub fn spawn_npcs(
     mut commands: Commands
 ) {
+    spawn_test_npc(&mut commands, Vector2Int::new(3, 5));
+    spawn_test_npc(&mut commands, Vector2Int::new(5, 5));
+}
+
+fn spawn_test_npc(commands: &mut Commands, v: Vector2Int) {
     commands.spawn((
         components::Actor::default(),
+        components::Health { value: 1 },
         components::Piece { kind: "NPC".to_string() },
-        Position { v: Vector2Int::new(3, 5) },
-        components::Walk
-    ));
-    commands.spawn((
-        components::Actor::default(),
-        components::Piece { kind: "NPC".to_string() },
-        Position { v: Vector2Int::new(5, 5) },
+        components::Melee { damage: 1 },
+        components::Occupier,
+        Position { v },
         components::Walk
     ));
 }

@@ -7,26 +7,26 @@ use std::{
 use super::{ORTHO_DIRECTIONS, Vector2Int};
 
 pub fn find_path(
-    a: Vector2Int,
-    b: Vector2Int,
+    start: Vector2Int,
+    end: Vector2Int,
     tiles: &HashSet<Vector2Int>,
     blockers: &HashSet<Vector2Int>
 ) -> Option<VecDeque<Vector2Int>> {
     
     let mut queue = BinaryHeap::new();
-    queue.push(Node { v: a, cost: 0});
+    queue.push(Node { v: start, cost: 0});
     let mut visited = HashMap::new();
     let mut came_from = HashMap::new();
 
     while let Some(Node { v, cost }) = queue.pop() {
-        if v == b { break; }
+        if v == end { break; }
         visited.insert(v, cost);
         for dir in ORTHO_DIRECTIONS {
             let n = v + dir;
             let new_cost = cost + 1;
             if !tiles.contains(&n) { continue }
             // we allow the target to be a blocker
-            if blockers.contains(&n) && n != b { continue }
+            if blockers.contains(&n) && n != end { continue }
             match visited.get(&n) {
                 Some(c) if *c <= new_cost => (),
                 _ => {
@@ -37,11 +37,11 @@ pub fn find_path(
         }
     }
     let mut path = VecDeque::new();
-    let mut cur = b;
+    let mut cur = end;
     while let Some(v) = came_from.get(&cur) {
         path.push_front(cur);
         cur = *v;
-        if cur == a { return Some(path) }
+        if cur == start { return Some(path) }
     }
     None
 }

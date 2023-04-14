@@ -38,7 +38,8 @@ fn player_position(
     for (key, dir) in DIR_KEY_MAPPING {
         if !keys.just_pressed(key) { continue; }
         let action = WalkAction(entity, position.v + dir);
-        actor.0 = Some(Box::new(action));
+        // action score does not matter for the player
+        actor.0 = vec![(Box::new(action), 0)];
         queue.0 = VecDeque::from([entity]);
         ev_input.send(PlayerInputReadyEvent);
     }
