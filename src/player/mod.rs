@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 
 use crate::board::components::Position;
-use crate::pieces::components::{Actor, Occupier, Piece};
+use crate::pieces::components::{Actor, Health, Occupier, Piece};
 use crate::states::MainState;
 use crate::vectors::Vector2Int;
 
@@ -23,6 +23,7 @@ fn spawn_player(
 ) {
     commands.spawn((
         Actor::default(),
+        Health { value: 1 },
         Occupier,
         Player,
         Piece { kind: "Player".to_string() },

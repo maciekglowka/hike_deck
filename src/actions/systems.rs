@@ -5,17 +5,41 @@ use crate::board::{
     CurrentBoard,
     components::Position
 };
-use crate::pieces::components::{Actor, Occupier, Walk};
+use crate::pieces::components::{Actor, Melee, Occupier, Walk};
 use crate::player::Player;
 use crate::vectors::{find_path, ORTHO_DIRECTIONS};
 
-use super::{ActorQueue, ActionsCompleteEvent, InvalidPlayerActionEvent, NextActorEvent};
-use super::models::WalkAction;
+use super::{ActorQueue, ActionsCompleteEvent, InvalidPlayerActionEvent, PendingActions, NextActorEvent};
+use super::models::{MeleeHitAction, WalkAction};
 
 const PLAYER_ATTACK_SCORE: i32 = 100;
 const MOVE_SCORE: i32 = 50;
 
+fn process_pending_actions(world: &mut World) -> bool {
+    // returns true if at least one pending action has been processed
+    // take action objects without holding the mutable reference to the world
+    let pending = match world.get_resource_mut::<PendingActions>() {
+        Some(mut res) => res.0.drain(..).collect::<Vec<_>>(),
+        _ => return false
+    };
+    let mut next = Vec::new();
+    let mut success = false;
+    for action in pending {
+        if let Ok(result) = action.execute(world) {
+            next.extend(result);
+            success = true;
+        }
+    }
+    // if there are any new actions assign them back to the resource
+    // should be safe to unwrap as we confirmed the resource at the beginning
+    let mut res = world.get_resource_mut::<PendingActions>().unwrap();
+    res.0 = next;
+    success
+}
+
 pub fn process_action_queue(world: &mut World) {
+    if process_pending_actions(world) { return }
+
     let Some(mut queue) = world.get_resource_mut::<ActorQueue>() else { return };
     let Some(entity) = queue.0.pop_front() else {
         world.send_event(ActionsCompleteEvent);
@@ -29,7 +53,10 @@ pub fn process_action_queue(world: &mut World) {
 
     let mut success = false;
     for action in possible_actions{
-        if action.0.execute(world) {
+        if let Ok(result) = action.0.execute(world) {
+            if let Some(mut pending) = world.get_resource_mut::<PendingActions>() {
+                pending.0 = result
+            }
             success = true;
             break;
         }
@@ -82,4 +109,20 @@ pub fn plan_walk(
         })
         .collect::<Vec<_>>();
     actor.0.extend(actions);
+}
+
+pub fn plan_melee(
+    mut query: Query<(&mut Actor, &Melee)>,
+    player_query: Query<&Position, With<Player>>,
+    queue: Res<ActorQueue>
+) {
+    let Some(entity) = queue.0.get(0) else { return };
+    let Ok((mut actor, melee)) = query.get_mut(*entity) else { return };
+    let Ok(player_position) = player_query.get_single() else { return };
+    let action = Box::new(MeleeHitAction{
+        attacker: *entity,
+        target: player_position.v,
+        damage: melee.damage
+    });
+    actor.0.push((action, PLAYER_ATTACK_SCORE + melee.damage as i32))
 }
