@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::actions::{TickEvent, ActionsCompleteEvent, InvalidPlayerActionEvent};
 use crate::graphics::GraphicsWaitEvent;
-use crate::input::PlayerInputReadyEvent;
+use crate::player::PlayerActionEvent;
 use crate::states::{GameState, MainState};
 
 pub struct ManagerPlugin;
@@ -11,7 +11,7 @@ impl Plugin for ManagerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(game_start.in_schedule(OnEnter(MainState::Game)))
             .add_system(game_end.in_schedule(OnExit(MainState::Game)))
-            .add_system(turn_update_start.run_if(on_event::<PlayerInputReadyEvent>()))
+            .add_system(turn_update_start.run_if(on_event::<PlayerActionEvent>()))
             .add_system(turn_update_end.run_if(on_event::<ActionsCompleteEvent>()))
             .add_system(turn_update_cancel.run_if(on_event::<InvalidPlayerActionEvent>()))
             .add_system(tick.in_set(OnUpdate(GameState::TurnUpdate)));
