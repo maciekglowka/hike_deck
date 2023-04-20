@@ -17,12 +17,14 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-// pub struct UseCardEvent(pub Entity, pub Option<Vector2Int>);
+#[derive(Default, Resource)]
+pub struct Deck {
+    pub cards: Vec<Entity>,
+    pub current_card: Option<Entity>
+}
 
 #[derive(Component)]
-pub struct Player {
-    pub cards: Vec<Entity>
-}
+pub struct Player;
 
 fn spawn_player(
     mut commands: Commands
@@ -34,11 +36,15 @@ fn spawn_player(
             cards::CardHolder(Box::new(cards::MeleeCard(1)))
         ).id();
 
+    commands.insert_resource(
+        Deck { cards: vec![walk_card, melee_card], ..Default::default() }
+    );
+
     commands.spawn((
         Actor::default(),
         Health { value: 3 },
         Occupier,
-        Player{ cards: vec![walk_card, melee_card] },
+        Player,
         Piece { kind: "Player".to_string() },
         Position { v: Vector2Int::new(0, 0) }
     ));
