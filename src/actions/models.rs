@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use std::any::Any;
 
 use crate::board::{
     CurrentBoard,
@@ -21,6 +22,7 @@ impl Action for DamageAction {
         }
         Ok(Vec::new())
     }
+    fn as_any(&self) -> &dyn std::any::Any { self }
 }
 
 pub struct MeleeHitAction{
@@ -42,6 +44,7 @@ impl Action for MeleeHitAction {
             .collect::<Vec<_>>();
         Ok(result)
     }
+    fn as_any(&self) -> &dyn std::any::Any { self }
 }
 
 pub struct WalkAction(pub Entity, pub Vector2Int);
@@ -56,4 +59,5 @@ impl Action for WalkAction {
         position.v = self.1;
         Ok(Vec::new())
     }
+    fn as_any(&self) -> &dyn std::any::Any { self }
 }

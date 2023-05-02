@@ -1,30 +1,58 @@
 use bevy::prelude::*;
+use std::collections::VecDeque;
 
+use crate::actions::{
+    ActionExecutedEvent,
+    models::{MeleeHitAction, WalkAction}
+};
 use crate::board::components::Position;
 use crate::pieces::components::Piece;
-use super::{GraphicsAssets, TILE_SIZE, PIECE_Z, PIECE_SPEED, POSITION_TOLERANCE};
+use super::{
+    GraphicsAssets, TILE_SIZE, PIECE_Z, PIECE_SPEED, POSITION_TOLERANCE,
+    components::PathAnimator
+};
 
-pub fn update_piece_position(
-    mut query: Query<(&Position, &mut Transform), With<Piece>>,
+pub fn walk_animation(
+    mut commands: Commands,
+    mut ev_action: EventReader<ActionExecutedEvent>,
+    mut ev_wait: EventWriter<super::GraphicsWaitEvent>
+) {
+    for ev in ev_action.iter() {
+        let action = ev.0.as_any();
+        if let Some(action) = action.downcast_ref::<WalkAction>() {
+            let target = super::get_world_vec(action.1, PIECE_Z);
+            commands.entity(action.0)
+                .insert(PathAnimator(VecDeque::from([target])));
+            ev_wait.send(super::GraphicsWaitEvent);
+        }
+    }
+}
+
+pub fn path_animator_update(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut PathAnimator, &mut Transform)>,
     time: Res<Time>,
     mut ev_wait: EventWriter<super::GraphicsWaitEvent>
 ) {
-    let mut animating = false;
-    for (position, mut transform) in query.iter_mut() {
-        let target = super::get_world_position(&position, PIECE_Z);
+    for (entity, mut animator, mut transform) in query.iter_mut() {
+        if animator.0.len() == 0 {
+            // this entity has completed it's animation
+            commands.entity(entity).remove::<PathAnimator>();
+            continue;
+        }
+        ev_wait.send(super::GraphicsWaitEvent);
+        let target = *animator.0.get(0).unwrap();
         let d = (target - transform.translation).length();
         if d > POSITION_TOLERANCE {
             transform.translation = transform.translation.lerp(
                 target,
                 PIECE_SPEED * time.delta_seconds()
             );
-            animating = true;
         } else {
+            // the entity is at the desired path position
             transform.translation = target;
+            animator.0.pop_front();
         }
-    }
-    if animating {
-        ev_wait.send(super::GraphicsWaitEvent);
     }
 }
 

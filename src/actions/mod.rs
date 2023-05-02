@@ -1,7 +1,10 @@
 use bevy::prelude::*;
-use std::collections::VecDeque;
+use std::{
+    any::Any,
+    collections::VecDeque
+};
 
-use crate::states::GameState;
+use crate::states::{GameState, TurnSet};
 
 pub mod models;
 mod systems;
@@ -16,6 +19,11 @@ impl Plugin for ActionsPlugin {
             .add_event::<NextActorEvent>()
             .add_event::<ActionsCompleteEvent>()
             .add_event::<InvalidPlayerActionEvent>()
+            .add_event::<ActionExecutedEvent>()
+            .configure_sets(
+                (ActionSet::Planning, ActionSet::Late)
+                .in_set(TurnSet::Logic)
+            )
             .configure_set(ActionSet::Planning.run_if(on_event::<NextActorEvent>()))
             .configure_set(ActionSet::Planning.before(ActionSet::Late))
             .add_system(systems::process_action_queue
@@ -40,6 +48,7 @@ enum ActionSet {
 
 pub trait Action: Send + Sync {
     fn execute(&self, world: &mut World) -> Result<Vec<Box<dyn Action>>, ()>;
+    fn as_any(&self) -> &dyn Any;
 }
 
 #[derive(Default, Resource)]
@@ -52,3 +61,4 @@ pub struct TickEvent;
 pub struct NextActorEvent;
 pub struct ActionsCompleteEvent;
 pub struct InvalidPlayerActionEvent;
+pub struct ActionExecutedEvent(pub Box<dyn Action>);
