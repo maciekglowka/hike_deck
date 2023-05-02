@@ -31,6 +31,7 @@ impl Plugin for GraphicsPlugin {
             .add_systems(
                 (
                     pieces::walk_animation,
+                    pieces::melee_animation,
                     pieces::path_animator_update,
                 ).in_set(TurnSet::Animation)
             )

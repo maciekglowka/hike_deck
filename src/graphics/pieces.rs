@@ -28,6 +28,25 @@ pub fn walk_animation(
     }
 }
 
+pub fn melee_animation(
+    mut commands: Commands,
+    query: Query<&Position>,
+    mut ev_action: EventReader<ActionExecutedEvent>,
+    mut ev_wait: EventWriter<super::GraphicsWaitEvent>
+) {
+    for ev in ev_action.iter() {
+        let action = ev.0.as_any();
+        if let Some(action) = action.downcast_ref::<MeleeHitAction>() {
+            let Ok(base_position) = query.get(action.attacker) else { continue };
+            let base = super::get_world_position(base_position, PIECE_Z);
+            let target = 0.5 * (base + super::get_world_vec(action.target, PIECE_Z));
+            commands.entity(action.attacker)
+                .insert(PathAnimator(VecDeque::from([target, base])));
+            ev_wait.send(super::GraphicsWaitEvent);
+        }
+    }
+}
+
 pub fn path_animator_update(
     mut commands: Commands,
     mut query: Query<(Entity, &mut PathAnimator, &mut Transform)>,
