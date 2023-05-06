@@ -4,7 +4,7 @@ use crate::player::{
     Deck, DeckEvent, DeckEventKind
 };
 
-use super::{helpers, UiAssets};
+use super::{helpers, ReloadUiEvent, UiAssets};
 
 const DECK_HEIGHT: f32 = 150.;
 const CARD_WIDTH: f32 = 96.;
@@ -17,6 +17,30 @@ pub struct DeckMenu;
 
 #[derive(Component)]
 pub struct CardButton(Entity, bool);
+
+pub fn card_click(
+    mut interactions: Query<(&Interaction, &mut CardButton), Changed<Interaction>>,
+    mut ev_deck: EventWriter<DeckEvent>,
+    mut ev_ui: EventWriter<ReloadUiEvent>
+) {
+    for (interaction, mut button) in interactions.iter_mut() {
+        match *interaction {
+            Interaction::Clicked => {
+                button.1 = true
+            },
+            Interaction::Hovered => {
+                if button.1 {
+                    ev_deck.send(DeckEvent(
+                        DeckEventKind::SelectCard(button.0)
+                    ));
+                    ev_ui.send(super::ReloadUiEvent);
+                }
+                button.1 = false;
+            },
+            Interaction::None => button.1 = false
+        }
+    }
+}
 
 pub fn draw_deck(
     mut commands: Commands,
@@ -82,8 +106,3 @@ fn clear_deck(
         commands.entity(entity).despawn_recursive();
     }
 }
-
-// pub fn card_click(
-//     mut interactions: Query<(&Interaction, &mut CardButton), Changed<Interaction>>,
-//     m
-// )

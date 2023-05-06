@@ -18,6 +18,9 @@ impl Plugin for UiPlugin {
             )
             .add_system(
                 deck::draw_deck.run_if(on_event::<ReloadUiEvent>())
+            )
+            .add_system(
+                deck::card_click.in_set(OnUpdate(GameState::PlayerInput))
             );
     }
 }

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::board::components::Position;
-use crate::player::{Player, Deck, DeckEvent, DeckEventKind};
+use crate::player::{Player, DeckEvent, DeckEventKind};
 use crate::states::GameState;
 use crate::vectors::Vector2Int;
 
@@ -22,7 +22,6 @@ const DIR_KEY_MAPPING: [(KeyCode, Vector2Int); 4] = [
 fn player_input(
     keys: ResMut<Input<KeyCode>>,
     mut player_query: Query<&Position, With<Player>>,
-    deck: Res<Deck>,
     mut ev_deck: EventWriter<DeckEvent>,
 ) {
     let Ok(position) = player_query.get_single_mut() else { return };
