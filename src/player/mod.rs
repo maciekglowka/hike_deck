@@ -9,7 +9,7 @@ use crate::states::MainState;
 use crate::vectors::Vector2Int;
 
 
-mod cards;
+pub mod cards;
 
 pub struct PlayerPlugin;
 

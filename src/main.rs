@@ -11,6 +11,7 @@ mod manager;
 mod pieces;
 mod player;
 mod states;
+mod ui;
 mod vectors;
 
 fn main() {
@@ -45,6 +46,7 @@ fn main() {
         .add_plugin(manager::ManagerPlugin)
         .add_plugin(pieces::PiecesPlugin)
         .add_plugin(player::PlayerPlugin)
+        .add_plugin(ui::UiPlugin)
         .add_startup_system(camera::setup)
         .run()
 }

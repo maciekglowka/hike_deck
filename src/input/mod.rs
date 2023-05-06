@@ -32,20 +32,4 @@ fn player_input(
             DeckEventKind::UseCard(Some(position.v + dir))
         ));
     }
-
-    // use this to temporarily switch between our only two cards
-    if keys.just_pressed(KeyCode::Key1) {
-        if let Some(entity) = deck.cards.get(0) {
-            ev_deck.send(DeckEvent(
-                DeckEventKind::SelectCard(*entity)
-            ));
-        }
-    }
-    if keys.just_pressed(KeyCode::Key2) {
-        if let Some(entity) = deck.cards.get(1) {
-            ev_deck.send(DeckEvent(
-                DeckEventKind::SelectCard(*entity)
-            ));
-        }
-    }
 }
