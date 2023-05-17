@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use crate::states::MainState;
 use crate::vectors::Vector2Int;
 
+mod dungeon;
 pub mod components;
 mod systems;
 

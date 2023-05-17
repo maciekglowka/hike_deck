@@ -1,25 +1,27 @@
 use bevy::prelude::*;
 use std::collections::HashMap;
 
-use crate::vectors::Vector2Int;
-
 use super::CurrentBoard;
+use super::dungeon::{Area, Dungeon};
 use super::components::{Position, Tile};
 
 pub fn spawn_map(
     mut commands: Commands,
     mut current: ResMut<CurrentBoard>
 ) {
+    let mut dungeon = Dungeon::new(2);
+    for _ in 0..4 {
+        dungeon.add_area(Area::new())
+    }
+    dungeon.generate();
+
     current.tiles = HashMap::new();
-    for x in 0..8 {
-        for y in 0..8 {
-            let v = Vector2Int::new(x, y);
-            let tile = commands.spawn((
-                    Position { v },
-                    Tile
-                ))
-                .id();
-            current.tiles.insert(v, tile);
-        }
+    for v in dungeon.to_tiles() {
+        let tile = commands.spawn((
+                Position { v },
+                Tile
+            ))
+            .id();
+        current.tiles.insert(v, tile);
     }
 }
