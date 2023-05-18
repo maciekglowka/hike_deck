@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use std::collections::HashMap;
 
 use super::CurrentBoard;
-use super::dungeon::{Area, Dungeon};
+use super::dungeon::{Area, Dungeon, tunneler};
 use super::components::{Position, Tile};
 
 pub fn spawn_map(
@@ -10,8 +10,12 @@ pub fn spawn_map(
     mut current: ResMut<CurrentBoard>
 ) {
     let mut dungeon = Dungeon::new(2);
-    for _ in 0..4 {
-        dungeon.add_area(Area::new())
+    for idx in 0..4 {
+        let tun = match idx % 2 {
+            0 => Box::new(tunneler::LShapeTunneler) as Box<dyn tunneler::Tunneler>,
+            _ => Box::new(tunneler::RandomTunneler) as Box<dyn tunneler::Tunneler>
+        };
+        dungeon.add_area(Area::new(tun))
     }
     dungeon.generate();
 

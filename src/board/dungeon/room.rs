@@ -1,6 +1,9 @@
+use rand::prelude::*;
 use std::collections::HashSet;
 
 use crate::vectors::Vector2Int;
+
+use bevy::prelude::*;
 
 pub struct Room {
     pub a: Vector2Int,
@@ -21,9 +24,15 @@ impl Room {
             Vector2Int::new(self.b.x, self.b.y), Vector2Int::new(self.a.x, self.b.y)
         ]
     }
+    pub fn random_point(&self) -> Vector2Int {
+        let mut rng = thread_rng();
+        let x = rng.gen_range(self.a.x..=self.b.x);
+        let y = rng.gen_range(self.a.y..=self.b.y);
+        Vector2Int::new(x, y)
+    }
     pub fn to_tiles(&self) -> HashSet<Vector2Int> {
-        (self.a.y..self.b.y).map(|y| {
-            (self.a.x..self.b.x).map(move |x| {
+        (self.a.y..=self.b.y).map(|y| {
+            (self.a.x..=self.b.x).map(move |x| {
                 Vector2Int::new(x, y)
             })
         })
