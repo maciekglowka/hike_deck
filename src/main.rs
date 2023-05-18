@@ -1,8 +1,18 @@
 use bevy::prelude::*;
 
+mod actions;
 mod assets;
+mod board;
+mod camera;
 mod globals;
+mod graphics;
+mod input;
+mod manager;
+mod pieces;
+mod player;
 mod states;
+mod ui;
+mod vectors;
 
 fn main() {
     #[cfg(target_arch = "wasm32")]
@@ -27,6 +37,16 @@ fn main() {
         )
         .insert_resource(Msaa::Off)
         .add_state::<states::MainState>()
+        .add_state::<states::GameState>()
+        .add_plugin(actions::ActionsPlugin)
         .add_plugin(assets::AssetPlugin)
+        .add_plugin(board::BoardPlugin)
+        .add_plugin(graphics::GraphicsPlugin)
+        .add_plugin(input::InputPlugin)
+        .add_plugin(manager::ManagerPlugin)
+        .add_plugin(pieces::PiecesPlugin)
+        .add_plugin(player::PlayerPlugin)
+        .add_plugin(ui::UiPlugin)
+        .add_startup_system(camera::setup)
         .run()
 }
