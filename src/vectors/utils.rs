@@ -16,11 +16,11 @@ pub fn find_path(
     let mut queue = BinaryHeap::new();
     queue.push(Node { v: start, cost: 0});
     let mut visited = HashMap::new();
+    visited.insert(start, 0);
     let mut came_from = HashMap::new();
 
     while let Some(Node { v, cost }) = queue.pop() {
         if v == end { break; }
-        visited.insert(v, cost);
         for dir in ORTHO_DIRECTIONS {
             let n = v + dir;
             let new_cost = cost + 1;
@@ -30,6 +30,7 @@ pub fn find_path(
             match visited.get(&n) {
                 Some(c) if *c <= new_cost => (),
                 _ => {
+                    visited.insert(n, new_cost);
                     queue.push(Node { v: n, cost: new_cost });
                     came_from.insert(n, v);
                 }
