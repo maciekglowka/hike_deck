@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::vectors::Vector2Int;
 
 mod area;
-mod room;
+pub mod room;
 pub mod tunneler;
 
 pub use area::Area;
